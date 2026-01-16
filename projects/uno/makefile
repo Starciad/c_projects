@@ -1,6 +1,6 @@
 # Variables
 CC = gcc
-CFLAGS = -Wall -Werror -g -Iinclude -std=c99 -pedantic-errors
+CFLAGS = -Wall -Werror -g -Iinclude -std=c11 -pedantic-errors
 BIN_DIR = bin
 OBJ_DIR = obj
 SRC_DIR = src
