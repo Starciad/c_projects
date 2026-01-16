@@ -23,3 +23,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+help:
+	@echo "Makefile for Uno Project"
+	@echo "Targets:"
+	@echo "  all      - Compile and link the Uno program"
+	@echo "  clean    - Remove compiled files"
+	@echo "  help     - Show this help message"
+
+.PHONY: all clean help
