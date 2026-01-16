@@ -27,6 +27,10 @@ static void display_battle_introduction(void) {
 
 }
 
+static void display_battle_stats(void) {
+
+}
+
 static void perform_player_turn(void) {
 
 }
@@ -61,9 +65,11 @@ void game_start(void) {
         // Battle loop
         do {
             // Player's turn
+            display_battle_stats();
             perform_player_turn();
             
             // Enemy's turn
+            display_battle_stats();
             perform_enemy_turn();
         } while (is_possible_continue_battle());
 
