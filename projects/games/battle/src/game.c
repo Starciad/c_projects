@@ -119,21 +119,50 @@ static void perform_attack(void) {
 
     puts("");
 
-    if (entity_is_critical_hit(&player)) {
+    if (player.is_preparing_attack) {
+        player.is_preparing_attack = false;
+
+        damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_POWERFUL);
+
+        puts("* You unleash your prepared powerful attack!");
+        game_sleep(1000);
+    } else if (entity_is_critical_hit(&player)) {
         damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
 
         game_sleep(1000);
         puts("* You dealt critical damage to the enemy!");
     }
 
-    entity_take_damage(&enemy, damage);
+    printf("* Your attack will deal %d damage to the enemy.\n", damage);
+    game_sleep(2000);
 
+    if (enemy.is_defending) {
+        puts("* However, the enemy was defending itself and the damage was halved!");
+        game_sleep(1000);
+    }
+
+    uint16_t actual_damage = entity_take_damage(&enemy, damage);
+
+    if (enemy.defense > 0) {
+        printf("* The enemy's defense reduced your damage by %d points.\n", enemy.defense);
+        game_sleep(1000);
+    }
+
+    printf("* You attacked the enemy for %d damage!\n", actual_damage);
     game_sleep(1000);
-    printf("* You attacked the enemy for %d damage!\n", damage);
 }
 
 static void perform_defend(void) {
+    player.is_defending = true;
+    player.is_preparing_attack = true;
 
+    game_sleep(1000);
+    puts("* You brace yourself to defend against the next attack!");
+    game_sleep(1000);
+    puts("* Enemy damage will be halved and subtracted from your current defense.");
+    game_sleep(1000);
+    puts("* You also prepare to deliver a strong attack next turn!");
+    game_sleep(1000);
 }
 
 static void display_magic_menu(void) {
@@ -183,7 +212,7 @@ static void perform_enemy_turn(void) {
     puts("* It's the enemy's turn!");
     game_sleep(1000);
 
-    const uint16_t action_choice = random_int(0, 1);
+    const uint16_t action_choice = random_int(0, 2);
 
     switch (action_choice) {
         // A random dialogue about the enemy. Does nothing on his turn.
@@ -201,25 +230,58 @@ static void perform_enemy_turn(void) {
                 default:
                     break;
             }
+            game_sleep(1000);
             break;
         // Attack the player
         case 1:
         {
             uint16_t damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_RANDOM);
 
-            if (entity_is_critical_hit(&enemy)) {
+            if (enemy.is_preparing_attack) {
+                enemy.is_preparing_attack = false;
+
+                damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_POWERFUL);
+
+                puts("* The enemy unleashes its powerful attack!");
+                game_sleep(1000);
+
+            } else if (entity_is_critical_hit(&enemy)) {
                 damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
 
-                game_sleep(1000);
                 puts("* The enemy dealt critical damage to you!");
+                game_sleep(1000);
             }
 
-            entity_take_damage(&player, damage);
+            printf("* The enemy's attack will deal %d damage to you.\n", damage);
+            game_sleep(2000);
 
+            if (player.is_defending) {
+                puts("* However, you were defending yourself and the damage was halved!");
+                game_sleep(1000);
+            }
+
+            uint16_t actual_damage = entity_take_damage(&player, damage);
+
+            if (player.defense > 0) {
+                printf("* Your defense reduced the damage by %d points.\n", player.defense);
+                game_sleep(1000);
+            }
+
+            printf("* The enemy attacked you for %d damage!\n", actual_damage);
             game_sleep(1000);
-            printf("* The enemy attacked you for %d damage!\n", damage);
             break;
         }
+        // Defend itself
+        case 2:
+            enemy.is_defending = true;
+            enemy.is_preparing_attack = true;
+
+            puts("* The enemy braces itself to defend against the next attack!");
+            game_sleep(1000);
+
+            puts("* Furthermore, the enemy's next attack will come more powerful!");
+            game_sleep(1000);
+            break;
         // Should not happen, but just in case
         default:
             break;

@@ -5,11 +5,13 @@ entity enemy_create(uint16_t challenge_level) {
     uint16_t health = random_int(1, 5) + challenge_level * 2;
 
     return (entity) {
-        .coins = random_int(5, 15) + challenge_level * 10,
+        .coins = (challenge_level * 10) + random_int(5, 15),
         .base_attack = challenge_level,
-        .critical_chance = random_int(5, 10) + challenge_level,
+        .critical_chance = challenge_level + random_int(5, 10),
         .current_health = health,
-        .defense = random_int(1, 5) + challenge_level,
+        .defense = challenge_level + random_int(0, 2),
         .maximum_health = health,
+        .is_defending = false,
+        .is_preparing_attack = false,
     };
 }

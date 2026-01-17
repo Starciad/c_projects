@@ -9,5 +9,7 @@ entity player_create(void) {
         .current_health = 10,
         .defense = 0,
         .maximum_health = 10,
+        .is_defending = false,
+        .is_preparing_attack = false,
     };
 }
