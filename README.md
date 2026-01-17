@@ -6,8 +6,9 @@ A collection of standalone C projects for learning the C programming language. E
 
 ### Basics
 
-- **[Hello World](projects/hello_world/)**: A simple program that prints "Hello, World!" to the console.
+- **[Hello World](projects/basics/hello_world/)**: A simple program that prints "Hello, World!" to the console.
 
 ### Games
 
-- **[Uno](projects/uno/)**: A command-line implementation of the Uno card game.
+- **[Battçe](projects/games/battle)**:
+- **[Uno](projects/games/uno/)**: A command-line implementation of the Uno card game.
