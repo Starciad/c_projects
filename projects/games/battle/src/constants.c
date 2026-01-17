@@ -1,3 +1,3 @@
 #include "constants.h"
 
-const uint16_t ATTACK_RANGE = 3;
+const int ATTACK_RANGE = 3;

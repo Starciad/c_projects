@@ -1,8 +1,6 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
-#include <stdint.h>
-
-extern int32_t random_int(int32_t min, int32_t max);
+extern int random_int(int min, int max);
 
 #endif // RANDOM_H

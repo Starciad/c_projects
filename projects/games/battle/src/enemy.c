@@ -1,8 +1,8 @@
 #include "enemy.h"
 #include "random.h"
 
-entity enemy_create(uint16_t challenge_level) {
-    uint16_t health = random_int(1, 5) + challenge_level * 2;
+entity enemy_create(int challenge_level) {
+    int health = random_int(1, 5) + challenge_level * 2;
 
     return (entity) {
         .coins = (challenge_level * 10) + random_int(5, 15),
