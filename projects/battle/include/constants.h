@@ -3,7 +3,11 @@
 
 #include <stdint.h>
 
-extern const int8_t DEFAULT_PLAYER_DEFENSE;
-extern const int8_t DEFAULT_PLAYER_HEALTH;
+extern const uint8_t ATTACK_RANGE;
+
+extern const uint8_t DEFAULT_PLAYER_BASE_ATTACK;
+extern const uint8_t DEFAULT_PLAYER_CRITICAL_CHANCE;
+extern const uint8_t DEFAULT_PLAYER_DEFENSE;
+extern const uint8_t DEFAULT_PLAYER_HEALTH;
 
 #endif // CONSTANTS_H

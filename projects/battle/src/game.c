@@ -1,4 +1,11 @@
 #include <stdio.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
 #include "enemy.h"
 #include "entity.h"
 #include "game.h"
@@ -9,6 +16,14 @@ static entity enemy;
 
 static uint8_t battles_won = 0;
 
+static void game_sleep(uint16_t milliseconds) {
+    #ifdef _WIN32
+        Sleep(milliseconds); // Windows Sleep takes milliseconds
+    #else
+        usleep(milliseconds * 1000); // POSIX usleep takes microseconds
+    #endif
+}
+
 static bool is_possible_next_battle(void) {
     return entity_is_alive(&player);
 }
@@ -18,8 +33,8 @@ static bool is_possible_continue_battle(void) {
 }
 
 static void display_welcome_message(void) {
-    printf("Welcome to the Battle Game!\n");
-    printf("Prepare to face off against fearsome enemies!\n");
+    puts("Welcome to the Battle Game!");
+    puts("Prepare to face off against fearsome enemies!");
 }
 
 static void display_battle_introduction(void) {
@@ -27,17 +42,33 @@ static void display_battle_introduction(void) {
 }
 
 static void display_battle_stats(void) {
-
+    puts("");
+    puts("<=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=>");
+    puts("");
 }
 
 static void display_entities_stats(void) {
     printf("Player (%d/%d)\n", player.current_health, player.maximum_health);
     printf("Enemy (%d/%d)\n", enemy.current_health, enemy.maximum_health);
-    printf("\n");
+    puts("");
 }
 
 static void perform_attack(void) {
+    uint8_t damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_RANDOM);
 
+    puts("");
+
+    if (entity_is_critical_hit(&player)) {
+        damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
+
+        game_sleep(500);
+        puts("* You dealt critical damage to the enemy!");
+    }
+
+    entity_take_damage(&enemy, damage);
+
+    game_sleep(500);
+    printf("* You attacked the enemy for %d damage!\n", damage);
 }
 
 static void perform_defend(void) {
@@ -49,16 +80,17 @@ static void display_magic_menu(void) {
 }
 
 static void display_use_item_menu(void) {
+
 }
 
 static void perform_player_turn(void) {
-    printf("It's your turn! What will you do?\n");
-    printf("\n");
-    printf("1. Attack (%d - %d damage) (%d%% critical chance)\n", 1, 1, 1);
-    printf("2. Magic\n");
-    printf("3. Defend\n");
-    printf("4. Use Item\n");
-    printf("\n");
+    puts("It's your turn! What will you do?");
+    puts("");
+    printf("1. Attack (%d - %d damage) (%d%% critical chance)\n", entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MINIMUM), entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MAXIMUM), player.critical_chance);
+    puts("2. Magic");
+    puts("3. Defend");
+    puts("4. Use Item");
+    puts("");
 
     repeat_choice:
     printf("Choose an action: ");
@@ -94,7 +126,6 @@ static void perform_enemy_turn(void) {
 
 void game_initialize(void) {
     player = player_create();
-
     battles_won = 0;
 }
 
@@ -113,24 +144,27 @@ void game_start(void) {
         // Battle loop
         do {
             display_battle_stats();
+            display_entities_stats();
 
             // Player's turn
-            display_entities_stats();
             perform_player_turn();
+            game_sleep(1000);
             
             // Enemy's turn
-            display_entities_stats();
             perform_enemy_turn();
+            game_sleep(1000);
         } while (is_possible_continue_battle());
 
         // Check if player is still alive
         if (entity_is_alive(&player)) {
             battles_won++;
-            printf("You have won %u battles!\n", battles_won);
+            printf("* You have won %u battles!\n", battles_won);
         } else {
-            printf("Oh no! You've been defeated!\n");
+            puts("* Oh no! You've been defeated!");
             break; // Exit game loop if player is defeated
         }
+
+        game_sleep(2000);
     } while (is_possible_next_battle());
 
     // Defeat message and cleanup
