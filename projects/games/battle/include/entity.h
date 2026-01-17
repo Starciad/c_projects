@@ -5,11 +5,12 @@
 #include <stdint.h>
 
 typedef struct entity {
-    uint8_t base_attack;
-    uint8_t critical_chance;
-    uint8_t current_health;
-    uint8_t defense;
-    uint8_t maximum_health;
+    uint32_t coins;
+    uint16_t base_attack;
+    uint16_t critical_chance;
+    uint16_t current_health;
+    uint16_t defense;
+    uint16_t maximum_health;
 } entity;
 
 typedef enum entity_attack_value_type {
@@ -20,8 +21,8 @@ typedef enum entity_attack_value_type {
 } entity_attack_value_type;
 
 extern bool entity_is_alive(const entity *e);
-extern uint8_t entity_get_attack_value(const entity *e, const entity_attack_value_type type);
+extern uint16_t entity_get_attack_value(const entity *e, const entity_attack_value_type type);
 extern bool entity_is_critical_hit(const entity *e);
-extern void entity_take_damage(entity *e, const uint8_t damage);
+extern void entity_take_damage(entity *e, const uint16_t damage);
 
 #endif // ENTITY_H

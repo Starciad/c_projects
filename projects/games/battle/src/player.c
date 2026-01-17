@@ -3,10 +3,11 @@
 
 entity player_create(void) {
     return (entity) {
-        .base_attack = DEFAULT_PLAYER_BASE_ATTACK,
-        .critical_chance = DEFAULT_PLAYER_CRITICAL_CHANCE,
-        .current_health = DEFAULT_PLAYER_HEALTH,
-        .defense = DEFAULT_PLAYER_DEFENSE,
-        .maximum_health = DEFAULT_PLAYER_HEALTH,
+        .coins = 0,
+        .base_attack = 1,
+        .critical_chance = 10,
+        .current_health = 10,
+        .defense = 0,
+        .maximum_health = 10,
     };
 }

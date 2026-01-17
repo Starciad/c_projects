@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-extern int16_t random_int(int16_t min, int16_t max);
+extern int32_t random_int(int32_t min, int32_t max);
 
 #endif // RANDOM_H

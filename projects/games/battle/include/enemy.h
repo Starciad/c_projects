@@ -4,6 +4,6 @@
 #include <stdint.h>
 #include "entity.h"
 
-extern entity enemy_create(uint8_t challenge_level);
+extern entity enemy_create(uint16_t challenge_level);
 
 #endif // ENEMY_H

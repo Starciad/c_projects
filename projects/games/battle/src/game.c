@@ -10,12 +10,16 @@
 #include "entity.h"
 #include "game.h"
 #include "player.h"
+#include "random.h"
 
 static entity player;
 static entity enemy;
 
-static bool is_first_battle = true;
-static uint8_t battles_won = 0;
+static uint16_t battles_won = 0;
+static uint16_t challenge_level = 1;
+
+// =============================================== //
+// System functions
 
 static void game_sleep(uint16_t milliseconds) {
     #ifdef _WIN32
@@ -25,9 +29,65 @@ static void game_sleep(uint16_t milliseconds) {
     #endif
 }
 
+// =============================================== //
+
+static void battle_rewards(void) {
+    const uint32_t coins_earned = enemy.coins;
+    
+    // Coins reward
+    player.coins += coins_earned;
+
+    printf("* You earned %u coins from the battle!\n", coins_earned);
+}
+
+static void player_level_up(void) {
+    puts("");
+    puts("Choose what you want to improve:");
+    puts("");
+    printf("1. Increase Base Attack (+1) [%d >> %d]\n", player.base_attack, player.base_attack + 1);
+    printf("2. Increase Critical Chance (+1%%) [%d%% >> %d%%]\n", player.critical_chance, player.critical_chance + 1);
+    printf("3. Increase Defense (+1) [%d >> %d]\n", player.defense, player.defense + 1);
+    printf("4. Increase Maximum Health (+5) [%d >> %d]\n", player.maximum_health, player.maximum_health + 5);
+    puts("");
+
+    repeat_level_up_choice:
+    printf("Enter your choice: ");
+
+    uint8_t choice;
+    scanf("%hhu", &choice);
+
+    switch (choice) {
+        case 1:
+            player.base_attack += 1;
+            printf("\n* Your Base Attack has increased to %d!\n", player.base_attack);
+            break;
+        case 2:
+            player.critical_chance += 1;
+            printf("\n* Your Critical Chance has increased to %d%%!\n", player.critical_chance);
+            break;
+        case 3:
+            player.defense += 1;
+            printf("\n* Your Defense has increased to %d!\n", player.defense);
+            break;
+        case 4:
+            player.maximum_health += 5;
+            player.current_health += 5; // Also heal the player
+            printf("\n* Your Maximum Health has increased to %d!\n", player.maximum_health);
+            break;
+        default:
+            puts("Invalid choice!");
+            goto repeat_level_up_choice;
+            break;
+    }
+}
+
 static void player_recover(void) {
     player.current_health = player.maximum_health;
+    puts("* You feel rejuvenated after the last battle...");
 }
+
+// =============================================== //
+// Display functions and battle actions
 
 static void display_welcome_message(void) {
     puts("* Welcome to the Battle Game!");
@@ -45,9 +105,7 @@ static void display_battle_introduction(void) {
 }
 
 static void display_battle_stats(void) {
-    puts("");
-    puts("<=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=>");
-    puts("");
+    puts("\n<=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=>\n");
 }
 
 static void display_entities_stats(void) {
@@ -57,7 +115,7 @@ static void display_entities_stats(void) {
 }
 
 static void perform_attack(void) {
-    uint8_t damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_RANDOM);
+    uint16_t damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_RANDOM);
 
     puts("");
 
@@ -125,13 +183,29 @@ static void perform_enemy_turn(void) {
     puts("* It's the enemy's turn!");
     game_sleep(1000);
 
-    // const uint8_t action_choice = random_int(1, 2); // Future: Randomize enemy actions
-    const uint8_t action_choice = 1; // For now, enemy will always attack
+    const uint16_t action_choice = random_int(0, 1);
 
     switch (action_choice) {
+        // A random dialogue about the enemy. Does nothing on his turn.
+        case 0:
+            switch (random_int(0, 2)) {
+                case 0:
+                    puts("* The enemy glares at you menacingly.");
+                    break;
+                case 1:
+                    puts("* The enemy seems to be sizing you up.");
+                    break;
+                case 2:
+                    puts("* The enemy lets out a chilling roar.");
+                    break;
+                default:
+                    break;
+            }
+            break;
+        // Attack the player
         case 1:
         {
-            uint8_t damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_RANDOM);
+            uint16_t damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_RANDOM);
 
             if (entity_is_critical_hit(&enemy)) {
                 damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
@@ -146,50 +220,60 @@ static void perform_enemy_turn(void) {
             printf("* The enemy attacked you for %d damage!\n", damage);
             break;
         }
+        // Should not happen, but just in case
         default:
             break;
     }
 }
 
 // =========================================== //
+// Game functions
 
 void game_start(void) {
     player = player_create();
     display_welcome_message();
 
+    bool is_battle_won = false;
+
     // Game loop
     do {
-        if (!is_first_battle) {
-            battles_won++;
-        }
-
         if (battles_won > 0) {
-            is_first_battle = false;
-
             // Message
             puts("* Congratulations on your victory!");
-            printf("* You have won %u battles!\n", battles_won);
+            game_sleep(2000);
+
+            printf("* You have won %u battle(s)!\n", battles_won);
+            game_sleep(2000);
+
+            // Rewards
+            battle_rewards();
+            game_sleep(2000);
 
             // Level Up
+            player_level_up();
+            game_sleep(2000);
 
             // Camping
         
             // Player Recovery
             player_recover();
-            puts("* You feel rejuvenated after the last battle...");
             game_sleep(2000);
+
+            // Messages
             puts("* But... a new enemy approaches!");
             game_sleep(2000);
         }
 
         // Create a new enemy for the battle
         // Challenge level is based on battles won
-        enemy = enemy_create(battles_won + 1);
+        enemy = enemy_create(challenge_level);
 
         // Battle Introduction
         display_battle_introduction();
 
         // Battle loop
+        is_battle_won = false;
+
         do {
             // Display battle stats
             display_battle_stats();
@@ -201,6 +285,7 @@ void game_start(void) {
 
             // Check if enemy is still alive
             if (!entity_is_alive(&enemy)) {
+                is_battle_won = true;
                 break;
             }
             
@@ -215,8 +300,16 @@ void game_start(void) {
         } while (true);
 
         // Final delays before next battle or defeat
-        game_sleep(2000);
-    } while (entity_is_alive(&player));
+        game_sleep(1000);
+
+        if (is_battle_won) {
+            battles_won++;
+            challenge_level++;
+            continue;
+        } else {
+            break;
+        }
+    } while (true);
 
     // Defeat message and cleanup
     puts("* Oh no! You've been defeated!");

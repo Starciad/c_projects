@@ -2,22 +2,20 @@
 #include "entity.h"
 #include "random.h"
 
+static uint16_t clamp_attack_value(const int16_t value) {
+    if (value <= 0) {
+        return 1;
+    } else {
+        return (uint16_t)value;
+    }
+}
+
 bool entity_is_alive(const entity *e) {
     return e->current_health > 0;
 }
 
-static uint8_t clamp_attack_value(int8_t value) {
-    if (value <= 0) {
-        return 1;
-    } else if (value > 255) {
-        return 255;
-    } else {
-        return (uint8_t)value;
-    }
-}
-
-uint8_t entity_get_attack_value(const entity *e, const entity_attack_value_type type) {
-    int8_t value;
+uint16_t entity_get_attack_value(const entity *e, const entity_attack_value_type type) {
+    int16_t value = 0;
 
     switch (type) {
         case ENTITY_ATTACK_VALUE_MINIMUM:
@@ -47,7 +45,7 @@ bool entity_is_critical_hit(const entity *e) {
     return random_int(1, 100) <= e->critical_chance;
 }
 
-void entity_take_damage(entity *e, const uint8_t damage) {
+void entity_take_damage(entity *e, const uint16_t damage) {
     if (damage >= e->current_health) {
         e->current_health = 0;
     } else {
