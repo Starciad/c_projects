@@ -3,14 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "entity.h"
 
-typedef struct player {
-    uint32_t defense;
-    uint32_t health;
-    char *name;
-} player;
-
-extern void player_initialize(player *p, char *name);
-extern bool player_is_alive(const player *p);
+extern entity player_create(void);
 
 #endif // PLAYER_H

@@ -1,21 +1,20 @@
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include "enemy.h"
+#include "entity.h"
 #include "game.h"
 #include "player.h"
 
-player main_player;
-enemy current_enemy;
+static entity player;
+static entity enemy;
 
-static uint16_t battles_won = 0;
+static uint8_t battles_won = 0;
 
 static bool is_possible_next_battle(void) {
-    return player_is_alive(&main_player);
+    return entity_is_alive(&player);
 }
 
 static bool is_possible_continue_battle(void) {
-    return player_is_alive(&main_player) && enemy_is_alive(&current_enemy);
+    return entity_is_alive(&player) && entity_is_alive(&enemy);
 }
 
 static void display_welcome_message(void) {
@@ -31,8 +30,60 @@ static void display_battle_stats(void) {
 
 }
 
-static void perform_player_turn(void) {
+static void display_entities_stats(void) {
+    printf("Player (%d/%d)\n", player.current_health, player.maximum_health);
+    printf("Enemy (%d/%d)\n", enemy.current_health, enemy.maximum_health);
+    printf("\n");
+}
 
+static void perform_attack(void) {
+
+}
+
+static void perform_defend(void) {
+
+}
+
+static void display_magic_menu(void) {
+
+}
+
+static void display_use_item_menu(void) {
+}
+
+static void perform_player_turn(void) {
+    printf("It's your turn! What will you do?\n");
+    printf("\n");
+    printf("1. Attack (%d - %d damage) (%d%% critical chance)\n", 1, 1, 1);
+    printf("2. Magic\n");
+    printf("3. Defend\n");
+    printf("4. Use Item\n");
+    printf("\n");
+
+    repeat_choice:
+    printf("Choose an action: ");
+
+    uint8_t choice;
+    scanf("%hhu", &choice);
+
+    switch (choice) {
+        case 1:
+            perform_attack();
+            break;
+        case 2:
+            display_magic_menu();
+            break;
+        case 3:
+            perform_defend();
+            break;
+        case 4:
+            display_use_item_menu();
+            break;
+        default:
+            printf("Invalid choice!\n");
+            goto repeat_choice;
+            break;
+    }
 }
 
 static void perform_enemy_turn(void) {
@@ -42,12 +93,9 @@ static void perform_enemy_turn(void) {
 // =========================================== //
 
 void game_initialize(void) {
-    char player_name[50];
+    player = player_create();
 
-    printf("Enter your player name: ");
-    fgets(player_name, sizeof(player_name), stdin);
-
-    player_initialize(&main_player, player_name);
+    battles_won = 0;
 }
 
 void game_start(void) {
@@ -57,24 +105,26 @@ void game_start(void) {
     do {
         // Create a new enemy for the battle
         // Challenge level is based on battles won
-        current_enemy = enemy_create(battles_won + 1);
+        enemy = enemy_create(battles_won + 1);
 
         // Battle Introduction
         display_battle_introduction();
 
         // Battle loop
         do {
-            // Player's turn
             display_battle_stats();
+
+            // Player's turn
+            display_entities_stats();
             perform_player_turn();
             
             // Enemy's turn
-            display_battle_stats();
+            display_entities_stats();
             perform_enemy_turn();
         } while (is_possible_continue_battle());
 
         // Check if player is still alive
-        if (player_is_alive(&main_player)) {
+        if (entity_is_alive(&player)) {
             battles_won++;
             printf("You have won %u battles!\n", battles_won);
         } else {
