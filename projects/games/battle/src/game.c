@@ -14,22 +14,15 @@
 static entity player;
 static entity enemy;
 
+static bool is_first_battle = true;
 static uint8_t battles_won = 0;
 
 static void game_sleep(uint16_t milliseconds) {
     #ifdef _WIN32
         Sleep(milliseconds); // Windows Sleep takes milliseconds
     #else
-        usleep(milliseconds * 1000); // POSIX usleep takes microseconds
+        sleep(milliseconds / 1000); // Unix sleep takes seconds
     #endif
-}
-
-static bool is_possible_next_battle(void) {
-    return entity_is_alive(&player);
-}
-
-static bool is_possible_continue_battle(void) {
-    return entity_is_alive(&player) && entity_is_alive(&enemy);
 }
 
 static void player_recover(void) {
@@ -37,8 +30,14 @@ static void player_recover(void) {
 }
 
 static void display_welcome_message(void) {
-    puts("Welcome to the Battle Game!");
-    puts("Prepare to face off against fearsome enemies!");
+    puts("* Welcome to the Battle Game!");
+    game_sleep(2000);
+
+    puts("* Try to survive as many battles as possible!");
+    game_sleep(2000);
+
+    puts("* Prepare to face off against fearsome enemies!");
+    game_sleep(4000);
 }
 
 static void display_battle_introduction(void) {
@@ -154,31 +153,38 @@ static void perform_enemy_turn(void) {
 
 // =========================================== //
 
-void game_initialize(void) {
-    player = player_create();
-    battles_won = 0;
-}
-
 void game_start(void) {
+    player = player_create();
     display_welcome_message();
 
     // Game loop
     do {
-        // Create a new enemy for the battle
-        // Challenge level is based on battles won
-        enemy = enemy_create(battles_won + 1);
+        if (!is_first_battle) {
+            battles_won++;
+        }
 
-        // Player's Level Up between battles
-        // Future: Implement player leveling system
-        
-        // Player recovery between battles
         if (battles_won > 0) {
+            is_first_battle = false;
+
+            // Message
+            puts("* Congratulations on your victory!");
+            printf("* You have won %u battles!\n", battles_won);
+
+            // Level Up
+
+            // Camping
+        
+            // Player Recovery
             player_recover();
             puts("* You feel rejuvenated after the last battle...");
             game_sleep(2000);
             puts("* But... a new enemy approaches!");
             game_sleep(2000);
         }
+
+        // Create a new enemy for the battle
+        // Challenge level is based on battles won
+        enemy = enemy_create(battles_won + 1);
 
         // Battle Introduction
         display_battle_introduction();
@@ -201,21 +207,19 @@ void game_start(void) {
             // Enemy's turn
             perform_enemy_turn();
             game_sleep(1000);
-        } while (is_possible_continue_battle());
 
-        // Check if player is still alive
-        if (entity_is_alive(&player)) {
-            battles_won++;
-            printf("* You have won %u battles!\n", battles_won);
-        } else {
-            puts("* Oh no! You've been defeated!");
-            break; // Exit game loop if player is defeated
-        }
+            // Check if player is still alive
+            if (!entity_is_alive(&player)) {
+                break;
+            }
+        } while (true);
 
+        // Final delays before next battle or defeat
         game_sleep(2000);
-    } while (is_possible_next_battle());
+    } while (entity_is_alive(&player));
 
     // Defeat message and cleanup
+    puts("* Oh no! You've been defeated!");
 
     // Show final stats
 
