@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <stdbool.h>
+#include "item.h"
 
 typedef struct entity {
     int base_attack;

@@ -41,7 +41,7 @@ int entity_get_attack_value(const entity *e, const entity_attack_value_type type
             break;
     }
 
-    return (int)clamp_attack_value(value);
+    return clamp_attack_value(value);
 }
 
 bool entity_is_critical_hit(const entity *e) {
@@ -50,7 +50,7 @@ bool entity_is_critical_hit(const entity *e) {
 
 // Returns the actual damage taken after defense calculations
 int entity_take_damage(entity *e, const int damage) {
-    int value = (int)damage;
+    int value = damage;
 
     // If the entity is defending, the damage is halved.
     if (e->is_defending) {
@@ -68,8 +68,8 @@ int entity_take_damage(entity *e, const int damage) {
     if (value >= e->current_health) {
         e->current_health = 0;
     } else {
-        e->current_health -= (int)value;
+        e->current_health -= value;
     }
 
-    return (int)value;
+    return value;
 }

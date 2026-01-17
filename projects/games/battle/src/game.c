@@ -9,6 +9,7 @@
 #include "enemy.h"
 #include "entity.h"
 #include "game.h"
+#include "item.h"
 #include "player.h"
 #include "random.h"
 
