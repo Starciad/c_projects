@@ -32,6 +32,10 @@ static bool is_possible_continue_battle(void) {
     return entity_is_alive(&player) && entity_is_alive(&enemy);
 }
 
+static void player_recover(void) {
+    player.current_health = player.maximum_health;
+}
+
 static void display_welcome_message(void) {
     puts("Welcome to the Battle Game!");
     puts("Prepare to face off against fearsome enemies!");
@@ -61,13 +65,13 @@ static void perform_attack(void) {
     if (entity_is_critical_hit(&player)) {
         damage = entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
 
-        game_sleep(500);
+        game_sleep(1000);
         puts("* You dealt critical damage to the enemy!");
     }
 
     entity_take_damage(&enemy, damage);
 
-    game_sleep(500);
+    game_sleep(1000);
     printf("* You attacked the enemy for %d damage!\n", damage);
 }
 
@@ -119,7 +123,33 @@ static void perform_player_turn(void) {
 }
 
 static void perform_enemy_turn(void) {
+    puts("* It's the enemy's turn!");
+    game_sleep(1000);
 
+    // const uint8_t action_choice = random_int(1, 2); // Future: Randomize enemy actions
+    const uint8_t action_choice = 1; // For now, enemy will always attack
+
+    switch (action_choice) {
+        case 1:
+        {
+            uint8_t damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_RANDOM);
+
+            if (entity_is_critical_hit(&enemy)) {
+                damage = entity_get_attack_value(&enemy, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
+
+                game_sleep(1000);
+                puts("* The enemy dealt critical damage to you!");
+            }
+
+            entity_take_damage(&player, damage);
+
+            game_sleep(1000);
+            printf("* The enemy attacked you for %d damage!\n", damage);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 // =========================================== //
@@ -138,17 +168,35 @@ void game_start(void) {
         // Challenge level is based on battles won
         enemy = enemy_create(battles_won + 1);
 
+        // Player's Level Up between battles
+        // Future: Implement player leveling system
+        
+        // Player recovery between battles
+        if (battles_won > 0) {
+            player_recover();
+            puts("* You feel rejuvenated after the last battle...");
+            game_sleep(2000);
+            puts("* But... a new enemy approaches!");
+            game_sleep(2000);
+        }
+
         // Battle Introduction
         display_battle_introduction();
 
         // Battle loop
         do {
+            // Display battle stats
             display_battle_stats();
             display_entities_stats();
 
             // Player's turn
             perform_player_turn();
             game_sleep(1000);
+
+            // Check if enemy is still alive
+            if (!entity_is_alive(&enemy)) {
+                break;
+            }
             
             // Enemy's turn
             perform_enemy_turn();
