@@ -1,9 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "player.h"
 #include "deck.h"
-#include <stdint.h>
+#include "player.h"
 
 #define MIN_PLAYERS_SHIFTING_COUNT 10
 #define MAX_PLAYERS_SHIFTING_COUNT 1000
@@ -13,23 +12,22 @@
 
 #define MAX_PLAYERS 10
 
-typedef enum GameDirection {
+typedef enum game_direction {
     GAME_DIRECTION_NONE = 0,
     GAME_DIRECTION_LEFT = -1,
     GAME_DIRECTION_RIGHT = 1
-} GameDirection;
+} game_direction;
 
-typedef struct Game {
-    Deck deck;
-    Player players[MAX_PLAYERS];
-    uint8_t num_players;
-    int8_t current_player_index;
-    Card discard_pile;
-    GameDirection direction;
-} Game;
+typedef struct game_status {
+    deck deck;
+    player players[MAX_PLAYERS];
+    int num_players;
+    int current_player_index;
+    card discard_pile;
+    game_direction direction;
+} game_status;
 
-// Function prototypes.
-void game_init(Game* game, uint8_t num_players);
-void game_start(Game* game);
+extern void game_init(game_status* g, int num_players);
+extern void game_start(game_status* g);
 
 #endif // GAME_H

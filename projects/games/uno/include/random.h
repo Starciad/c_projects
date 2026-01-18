@@ -1,9 +1,6 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef RANDOM_H
+#define RANDOM_H
 
-#include <stdint.h>
+extern int random_int(const int min, const int max);
 
-// Function prototypes.
-int16_t random_int(int16_t min, int16_t max);
-
-#endif // UTILS_H
+#endif // RANDOM_H

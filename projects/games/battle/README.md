@@ -19,3 +19,21 @@ The game is infinitely playable, with a simple but engaging combat system, and i
 - Simple text-based user interface
 - Progressive difficulty scaling
 - Infinite replayability
+
+## Compilation and Execution
+
+To compile and run the Battle game, follow these steps:
+
+1. Ensure you have a C compiler (e.g., `gcc`) and make installed.
+2. In this directory, run the following command to compile the game:
+
+    ```bash
+    make
+    ```
+
+3. When building the application, two directories will appear: `obj` and `bin`. The program executable is located in the `bin` directory.
+4. To run the game, execute the following command:
+
+    ```bash
+    ./bin/battle
+    ```

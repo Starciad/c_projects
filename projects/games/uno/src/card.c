@@ -2,7 +2,7 @@
 #include "card.h"
 #include <stdio.h>
 
-const char* color_names[] =
+static const char* color_names[] =
 {
     /* [0] */ ANSI_COLOR_RED "Red" ANSI_COLOR_RESET,
     /* [1] */ ANSI_COLOR_BLUE "Blue" ANSI_COLOR_RESET,
@@ -11,7 +11,7 @@ const char* color_names[] =
     /* [4] */ "Black"
 };
 
-const char* value_names[] =
+static const char* value_names[] =
 { 
     /* [0] */ "Zero",
     /* [1] */ "One",
@@ -30,7 +30,7 @@ const char* value_names[] =
     /* [14] */ "Wild Draw Four"
 };
 
-const char* type_names[] =
+static const char* type_names[] =
 {
     /* [0] */ "Number",
     /* [1] */ "Skip",
@@ -41,7 +41,7 @@ const char* type_names[] =
 };
 
 // Returns the ANSI color string corresponding to the card color.
-const char* get_ansi_color(CardColor color)
+static const char* get_ansi_color(card_color color)
 {
     switch (color)
     {
@@ -54,31 +54,31 @@ const char* get_ansi_color(CardColor color)
 }
 
 // Prints a card with ANSI colors.
-extern void card_print(const Card* card)
+void card_print(const card* c)
 {
-    const char* color_code = get_ansi_color(card->color);
+    const char* color_code = get_ansi_color(c->color);
 
-    switch (card->type)
+    switch (c->type)
     {
         case CARD_NUMBER_TYPE:
-            printf("[%s%s%s (%s%s%s)]", color_code, value_names[card->value], ANSI_COLOR_RESET, color_code, color_names[card->color], ANSI_COLOR_RESET);
+            printf("[%s%s%s (%s%s%s)]", color_code, value_names[c->value], ANSI_COLOR_RESET, color_code, color_names[c->color], ANSI_COLOR_RESET);
             break;
 
         case CARD_SKIP_TYPE:
         case CARD_REVERSE_TYPE:
         case CARD_DRAW_TWO_TYPE:
-            printf("[%s%s%s (%s%s%s)]", color_code, type_names[card->type], ANSI_COLOR_RESET, color_code, color_names[card->color], ANSI_COLOR_RESET);
+            printf("[%s%s%s (%s%s%s)]", color_code, type_names[c->type], ANSI_COLOR_RESET, color_code, color_names[c->color], ANSI_COLOR_RESET);
             break;
 
         case CARD_WILD_TYPE:
         case CARD_WILD_DRAW_FOUR_TYPE:
-            if (card->color == CARD_COLOR_BLACK)
+            if (c->color == CARD_COLOR_BLACK)
             {
-                printf("[%s%s%s]", ANSI_COLOR_MAGENTA, type_names[card->type], ANSI_COLOR_RESET);
+                printf("[%s%s%s]", ANSI_COLOR_MAGENTA, type_names[c->type], ANSI_COLOR_RESET);
             }
             else
             {
-                printf("[%s%s%s (%s%s%s)]", color_code, type_names[card->type], ANSI_COLOR_RESET, color_code, color_names[card->color], ANSI_COLOR_RESET);
+                printf("[%s%s%s (%s%s%s)]", color_code, type_names[c->type], ANSI_COLOR_RESET, color_code, color_names[c->color], ANSI_COLOR_RESET);
             }
             break;
 
@@ -88,7 +88,7 @@ extern void card_print(const Card* card)
 }
 
 // Checks if a card is playable.
-extern bool card_is_playable(const Card* card, const Card* top_card)
+bool card_is_playable(const card* c, const card* top_card)
 {
     /*
      * A card is playable if:
@@ -99,19 +99,19 @@ extern bool card_is_playable(const Card* card, const Card* top_card)
      */
     
     // If the current card is the same color as the top card (or the top card is black), then play it.
-    if (card->color == top_card->color || card->color == CARD_COLOR_BLACK)
+    if (c->color == top_card->color || c->color == CARD_COLOR_BLACK)
     {
         return true;
     }
 
     // Ensure value comparison is only for non-special cards
-    if (card->value != CARD_VALUE_NONE && top_card->value != CARD_VALUE_NONE && card->value == top_card->value)
+    if (c->value != CARD_VALUE_NONE && top_card->value != CARD_VALUE_NONE && c->value == top_card->value)
     {
         return true;
     }
 
     // Ensure type comparison is only for action cards.
-    if (card->type != CARD_NUMBER_TYPE && card->type == top_card->type)
+    if (c->type != CARD_NUMBER_TYPE && c->type == top_card->type)
     {
         return true;
     }

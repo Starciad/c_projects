@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-// ANSI color codes.
 #define ANSI_COLOR_RESET "\033[0m"
 #define ANSI_COLOR_RED "\033[31m"
 #define ANSI_COLOR_GREEN "\033[32m"

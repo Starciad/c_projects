@@ -7,7 +7,7 @@ int main(void)
 {
     srand(time(NULL));
 
-    Game game;
+    game_status game;
     int num_players;
 
     printf("\n");

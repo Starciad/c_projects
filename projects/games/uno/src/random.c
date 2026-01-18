@@ -1,8 +1,7 @@
-#include "random.h"
 #include <stdlib.h>
+#include "random.h"
 
-// Returns a random integer in the given range.
-extern int16_t random_int(int16_t min, int16_t max)
+int random_int(const int min, const int max)
 {
     return min + rand() % (max - min + 1);
 }

@@ -30,10 +30,28 @@ UNO is a card game created by Merle Robbins in 1971. Players race to discard all
 
 **Special Cards:**
 
-| Card               | Effect                                        |
+| card               | Effect                                        |
 | ------------------ | --------------------------------------------- |
 | **Skip**           | Next player loses turn                        |
 | **Reverse**        | Reverses turn order                           |
 | **Draw Two**       | Next player draws 2, loses turn               |
 | **Wild**           | Choose a color                                |
 | **Wild Draw Four** | Choose color, next player draws 4, loses turn |
+
+## Compilation and Execution
+
+To compile and run the Uno game, follow these steps:
+
+1. Ensure you have a C compiler (e.g., `gcc`) and make installed.
+2. In this directory, run the following command to compile the game:
+
+    ```bash
+    make
+    ```
+
+3. When building the application, two directories will appear: `obj` and `bin`. The program executable is located in the `bin` directory.
+4. To run the game, execute the following command:
+
+    ```bash
+    ./bin/uno
+    ```

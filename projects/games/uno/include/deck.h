@@ -2,18 +2,16 @@
 #define DECK_H
 
 #include "card.h"
-#include <stdint.h>
 
 #define DECK_SIZE 108
 
-typedef struct Deck {
-    Card cards[DECK_SIZE];
-    uint8_t top_index; // Tracks the next card to be drawn.
-} Deck;
+typedef struct deck {
+    card cards[DECK_SIZE];
+    int top_index; // Tracks the next card to be drawn.
+} deck;
 
-// Function prototypes.
-void deck_init(Deck* deck);
-void deck_shuffle(Deck* deck);
-Card deck_draw(Deck* deck);
+extern void deck_init(deck* deck);
+extern void deck_shuffle(deck* deck);
+extern card deck_draw(deck* deck);
 
 #endif // DECK_H

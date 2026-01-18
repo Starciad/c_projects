@@ -1,22 +1,22 @@
-#include "ai.h"
 #include <stdbool.h>
+#include "ai.h"
 
 // AI selects the best playable card.
-extern bool ai_try_select_card(const Player* player, const Card* top_card, Card* selected_card)
+bool ai_try_select_card(const player* p, const card* top_card, card* selected_card)
 {
-    uint8_t best_index = 255;
+    int best_index = 255;
 
     // Prioritize action cards.
-    for (uint8_t i = 0; i < player->hand_size; i++)
+    for (int i = 0; i < p->hand_size; i++)
     {
-        if (card_is_playable(&player->hand[i], top_card))
+        if (card_is_playable(&p->hand[i], top_card))
         {
             // Immediately play an action card.
-            if (player->hand[i].value == CARD_VALUE_SKIP ||
-                player->hand[i].value == CARD_VALUE_REVERSE ||
-                player->hand[i].value == CARD_VALUE_DRAW_TWO)
+            if (p->hand[i].value == CARD_VALUE_SKIP ||
+                p->hand[i].value == CARD_VALUE_REVERSE ||
+                p->hand[i].value == CARD_VALUE_DRAW_TWO)
             {
-                *selected_card = player->hand[i];
+                *selected_card = p->hand[i];
                 return true;
             }
 
@@ -31,16 +31,16 @@ extern bool ai_try_select_card(const Player* player, const Card* top_card, Card*
     // Play regular number cards first, save Wild cards.
     if (best_index != 255)
     {
-        *selected_card = player->hand[best_index];
+        *selected_card = p->hand[best_index];
         return true;
     }
 
     // Last resort: play Wild cards.
-    for (uint8_t i = 0; i < player->hand_size; i++)
+    for (int i = 0; i < p->hand_size; i++)
     {
-        if (player->hand[i].value == CARD_VALUE_WILD || player->hand[i].value == CARD_VALUE_WILD_DRAW_FOUR)
+        if (p->hand[i].value == CARD_VALUE_WILD || p->hand[i].value == CARD_VALUE_WILD_DRAW_FOUR)
         {
-            *selected_card = player->hand[i];
+            *selected_card = p->hand[i];
             return true;
         }
     }

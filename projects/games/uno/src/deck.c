@@ -1,13 +1,12 @@
+#include <stdio.h>
+#include <time.h>
 #include "deck.h"
 #include "random.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 // Function to initialize the UNO deck.
-extern void deck_init(Deck* deck)
+void deck_init(deck* deck)
 {
-    uint8_t index = 0;
+    int index = 0;
 
     // Populate deck with standard cards.
 
@@ -25,21 +24,21 @@ extern void deck_init(Deck* deck)
         // This loop creates the numeric cards (from 1 to 9) for the current color group.
         for (int j = 0; j <= 9; j++)
         {
-            deck->cards[index++] = (Card)
+            deck->cards[index++] = (card)
             {
-                .color = (CardColor)i,
+                .color = (card_color)i,
                 .type = CARD_NUMBER_TYPE,
-                .value = (uint8_t)j
+                .value = j
             };
 
             // This conditional exists to ensure that the number 0 card only appears once per color, while the numbers 1 through 9 appear twice per color in the deck.
             if (j != 0)
             {
-                deck->cards[index++] = (Card)
+                deck->cards[index++] = (card)
                 {
-                    .color = (CardColor)i,
+                    .color = (card_color)i,
                     .type = CARD_NUMBER_TYPE,
-                    .value = (uint8_t)j
+                    .value = j
                 };
             }
         }
@@ -47,23 +46,23 @@ extern void deck_init(Deck* deck)
         // This loop is responsible for creating the special cards of the respective color group. He creates the same cards twice.
         for (int j = 0; j < 2; j++)
         {
-            deck->cards[index++] = (Card)
+            deck->cards[index++] = (card)
             {
-                .color = (CardColor)i,
+                .color = (card_color)i,
                 .type = CARD_SKIP_TYPE,
                 .value = CARD_VALUE_NONE
             };
             
-            deck->cards[index++] = (Card)
+            deck->cards[index++] = (card)
             {
-                .color = (CardColor)i,
+                .color = (card_color)i,
                 .type = CARD_REVERSE_TYPE,
                 .value = CARD_VALUE_NONE
             };
 
-            deck->cards[index++] = (Card)
+            deck->cards[index++] = (card)
             {
-                .color = (CardColor)i,
+                .color = (card_color)i,
                 .type = CARD_DRAW_TWO_TYPE,
                 .value = CARD_VALUE_NONE
             };
@@ -73,14 +72,14 @@ extern void deck_init(Deck* deck)
     // Creates wild and wild cards draw four cards.
     for (int i = 0; i < 4; i++)
     {
-        deck->cards[index++] = (Card)
+        deck->cards[index++] = (card)
         {
             .color = CARD_COLOR_BLACK,
             .type = CARD_WILD_TYPE,
             .value = CARD_VALUE_NONE
         };
         
-        deck->cards[index++] = (Card)
+        deck->cards[index++] = (card)
         {
             .color = CARD_COLOR_BLACK,
             .type = CARD_WILD_DRAW_FOUR_TYPE,
@@ -92,20 +91,20 @@ extern void deck_init(Deck* deck)
 }
 
 // Function to shuffle the deck.
-extern void deck_shuffle(Deck* deck)
+void deck_shuffle(deck* deck)
 {
     for (int i = DECK_SIZE - 1; i > 0; i--)
     {
         int j = random_int(0, i); // Utility function for random numbers.
 
-        Card temp = deck->cards[i];
+        card temp = deck->cards[i];
         deck->cards[i] = deck->cards[j];
         deck->cards[j] = temp;
     }
 }
 
 // Function to draw a card from the deck.
-extern Card deck_draw(Deck* deck)
+card deck_draw(deck* deck)
 {
     if (deck->top_index >= DECK_SIZE)
     {
