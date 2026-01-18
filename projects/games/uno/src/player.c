@@ -1,7 +1,7 @@
-#include "player.h"
-#include "random.h"
 #include <stdio.h>
 #include <string.h>
+#include "player.h"
+#include "random.h"
 
 // Initializes a player.
 void player_init(player* p, const char* name, const bool is_ai)

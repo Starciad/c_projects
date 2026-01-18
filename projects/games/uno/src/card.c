@@ -1,6 +1,6 @@
+#include <stdio.h>
 #include "ansicolor.h"
 #include "card.h"
-#include <stdio.h>
 
 static const char* color_names[] =
 {

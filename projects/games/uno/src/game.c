@@ -337,7 +337,7 @@ static void game_execute_ai_turn(game_status* g, player* p)
 // =============================================================================== //
 
 // Initializes the game, dealing the cards and setting up the players.
-void game_init(game_status* g, int num_players)
+void game_init(game_status* g, const int num_players)
 {
     g->num_players = num_players;
     g->current_player_index = 0;

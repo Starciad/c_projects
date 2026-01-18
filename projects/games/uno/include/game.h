@@ -27,7 +27,7 @@ typedef struct game_status {
     game_direction direction;
 } game_status;
 
-extern void game_init(game_status* g, int num_players);
+extern void game_init(game_status* g, const int num_players);
 extern void game_start(game_status* g);
 
 #endif // GAME_H
