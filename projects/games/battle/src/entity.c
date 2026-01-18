@@ -31,7 +31,8 @@ int entity_get_attack_value(const entity *e, const entity_attack_value_type type
             value = (entity_get_attack_value(e, ENTITY_ATTACK_VALUE_RANDOM) + 1) * 2;
             break;
         case ENTITY_ATTACK_VALUE_POWERFUL:
-            value = entity_get_attack_value(e, ENTITY_ATTACK_VALUE_RANDOM) + (entity_get_attack_value(e, ENTITY_ATTACK_VALUE_CRITICAL_HIT) / 2);
+            value = (entity_get_attack_value(e, ENTITY_ATTACK_VALUE_MAXIMUM) / 2) +
+                    entity_get_attack_value(e, ENTITY_ATTACK_VALUE_CRITICAL_HIT);
             break;
         default:
             value = e->base_attack;
