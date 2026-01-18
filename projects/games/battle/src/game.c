@@ -70,10 +70,10 @@ static void player_level_up(void) {
     puts("");
     puts("Choose what you want to improve:");
     puts("");
-    printf("1. Increase Base Attack (+1) [%d >> %d]\n", player.base_attack, player.base_attack + 1);
-    printf("2. Increase Critical Chance (+1%%) [%d%% >> %d%%]\n", player.critical_chance, player.critical_chance + 1);
-    printf("3. Increase Defense (+1) [%d >> %d]\n", player.defense, player.defense + 1);
-    printf("4. Increase Maximum Health (+5) [%d >> %d]\n", player.maximum_health, player.maximum_health + 5);
+    printf("1. Increase Base Attack (+2) [%d >> %d]\n", player.base_attack, player.base_attack + 2);
+    printf("2. Increase Critical Chance (+5%%) [%d%% >> %d%%]\n", player.critical_chance, player.critical_chance + 5);
+    printf("3. Increase Defense (+2) [%d >> %d]\n", player.defense, player.defense + 2);
+    printf("4. Increase Maximum Health (+10) [%d >> %d]\n", player.maximum_health, player.maximum_health + 10);
     puts("");
 
     repeat_level_up_choice:
@@ -84,20 +84,20 @@ static void player_level_up(void) {
 
     switch (choice) {
         case 1:
-            player.base_attack += 1;
+            player.base_attack += 2;
             printf("\n* Your Base Attack has increased to %d!\n", player.base_attack);
             break;
         case 2:
-            player.critical_chance += 1;
+            player.critical_chance += 5;
             printf("\n* Your Critical Chance has increased to %d%%!\n", player.critical_chance);
             break;
         case 3:
-            player.defense += 1;
+            player.defense += 2;
             printf("\n* Your Defense has increased to %d!\n", player.defense);
             break;
         case 4:
-            player.maximum_health += 5;
-            player.current_health += 5; // Also heal the player
+            player.maximum_health += 10;
+            player.current_health += 10; // Also heal the player
             printf("\n* Your Maximum Health has increased to %d!\n", player.maximum_health);
             break;
         default:
@@ -115,7 +115,6 @@ static void populate_shop_items(void) {
 
 static void display_shop_items(void) {
     puts("Available items in the shop:");
-    game_sleep(1500);
 
     for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
         if (shop_items[i] != ITEM_NONE) {
@@ -123,8 +122,6 @@ static void display_shop_items(void) {
         } else {
             printf("  %02d. (sold out)\n", i + 1);
         }
-
-        game_sleep(1000);
     }
 
     puts("");
@@ -145,15 +142,12 @@ static void perform_shop_menu(void) {
 
     puts("");
     puts("Welcome to the shop! Here you can buy items to help you in your battles.");
-    game_sleep(1800);
 
     do {
         display_shop_items();
         game_sleep(1000);
 
         printf("You have %d coins.\n", player.coins);
-        game_sleep(1000);
-
         printf("Enter the number of the item you want to buy (or -1 to exit): ");
 
         int choice;
@@ -186,13 +180,14 @@ static void perform_shop_menu(void) {
             shop_items[choice - 1] = ITEM_NONE; // Mark the item as sold out
 
             printf("* You bought a %s for %d coins!\n\n", item_get_name(selected_item), item_price);
-            game_sleep(1800);
+            game_sleep(1500);
         }
     } while (shop_has_items());
 }
 
 static void player_recover(void) {
-    player.current_health = player.maximum_health;
+    entity_heal(&player, player.maximum_health);
+    
     player.is_defending = false;
     player.is_preparing_attack = false;
 
