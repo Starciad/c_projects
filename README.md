@@ -10,5 +10,5 @@ A collection of standalone C projects for learning the C programming language. E
 
 ### Games
 
-- **[Battçe](projects/games/battle)**:
+- **[Battle](projects/games/battle)**: A command-line turn-based RPG game.
 - **[Uno](projects/games/uno/)**: A command-line implementation of the Uno card game.
