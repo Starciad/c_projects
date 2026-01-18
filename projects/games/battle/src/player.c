@@ -1,4 +1,3 @@
-#include "constants.h"
 #include "player.h"
 
 entity player_create(void) {
@@ -7,8 +6,10 @@ entity player_create(void) {
         .base_attack = 1,
         .critical_chance = 10,
         .current_health = 10,
+        .current_mana = 5,
         .defense = 0,
         .maximum_health = 10,
+        .maximum_mana = 5,
         .is_defending = false,
         .is_preparing_attack = false,
     };

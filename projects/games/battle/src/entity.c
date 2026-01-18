@@ -1,6 +1,7 @@
-#include "constants.h"
 #include "entity.h"
 #include "random.h"
+
+const int ATTACK_RANGE = 3;
 
 static int clamp_attack_value(const int value) {
     if (value <= 0) {
@@ -8,10 +9,6 @@ static int clamp_attack_value(const int value) {
     } else {
         return value;
     }
-}
-
-bool entity_is_alive(const entity *e) {
-    return e->current_health > 0;
 }
 
 int entity_get_attack_value(const entity *e, const entity_attack_value_type type) {
@@ -44,8 +41,30 @@ int entity_get_attack_value(const entity *e, const entity_attack_value_type type
     return clamp_attack_value(value);
 }
 
-bool entity_is_critical_hit(const entity *e) {
-    return random_int(1, 100) <= e->critical_chance;
+int entity_heal(entity *e, const int heal_amount) {
+    int actual_heal = heal_amount;
+
+    if (e->current_health + heal_amount > e->maximum_health) {
+        actual_heal = e->maximum_health - e->current_health;
+        e->current_health = e->maximum_health;
+    } else {
+        e->current_health += heal_amount;
+    }
+
+    return actual_heal;
+}
+
+int entity_restore_mana(entity *e, const int mana_amount) {
+    int actual_mana = mana_amount;
+
+    if (e->current_mana + mana_amount > e->maximum_mana) {
+        actual_mana = e->maximum_mana - e->current_mana;
+        e->current_mana = e->maximum_mana;
+    } else {
+        e->current_mana += mana_amount;
+    }
+
+    return actual_mana;
 }
 
 // Returns the actual damage taken after defense calculations
@@ -72,4 +91,12 @@ int entity_take_damage(entity *e, const int damage) {
     }
 
     return value;
+}
+
+bool entity_is_alive(const entity *e) {
+    return e->current_health > 0;
+}
+
+bool entity_is_critical_hit(const entity *e) {
+    return random_int(1, 100) <= e->critical_chance;
 }

@@ -9,12 +9,16 @@
 #include "enemy.h"
 #include "entity.h"
 #include "game.h"
+#include "inventory.h"
 #include "item.h"
 #include "player.h"
 #include "random.h"
 
 static entity player;
 static entity enemy;
+
+static inventory player_inventory;
+// static inventory enemy_inventory;
 
 static int battles_won = 0;
 static int challenge_level = 1;
@@ -178,8 +182,32 @@ static void display_magic_menu(void) {
 
 }
 
-static void display_use_item_menu(void) {
+static bool perform_inventory_menu(void) {
+    printf("* You open your inventory (%d item(s)):\n", inventory_count_items(&player_inventory));
+    inventory_print(&player_inventory);
+    puts("(type -1 to exit inventory)");
+    game_sleep(1800);
 
+    repeat_inventory_choice:
+    printf("Select an item to use: ");
+    int choice;
+    scanf("%d", &choice);
+
+    if (choice == -1) {
+        puts("* You close your inventory.\n");
+        return false;
+    } else if (choice < 1 || choice > INVENTORY_CAPACITY) {
+        puts("Invalid choice!");
+        goto repeat_inventory_choice;
+    } else if (player_inventory.items[choice - 1] == ITEM_NONE) {
+        puts("There is no item in that slot!");
+        goto repeat_inventory_choice;
+    } else {
+        item selected_item = player_inventory.items[choice - 1];
+        item_use(&player, selected_item);
+        inventory_remove_item(&player_inventory, selected_item);
+        return true;
+    }
 }
 
 static void perform_player_turn(void) {
@@ -188,7 +216,7 @@ static void perform_player_turn(void) {
     printf("1. Attack (%d - %d damage) (%d%% critical chance)\n", entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MINIMUM), entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MAXIMUM), player.critical_chance);
     puts("2. Magic");
     puts("3. Defend");
-    puts("4. Use Item");
+    puts("4. Inventory");
     puts("");
 
     repeat_choice:
@@ -210,7 +238,9 @@ static void perform_player_turn(void) {
             perform_defend();
             break;
         case 4:
-            display_use_item_menu();
+            if (!perform_inventory_menu()) {
+                goto repeat_choice;
+            }
             break;
         default:
             printf("Invalid choice!\n");

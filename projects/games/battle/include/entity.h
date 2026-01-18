@@ -2,15 +2,18 @@
 #define ENTITY_H
 
 #include <stdbool.h>
-#include "item.h"
+
+extern const int ATTACK_RANGE;
 
 typedef struct entity {
     int base_attack;
     int coins;
     int critical_chance;
     int current_health;
+    int current_mana;
     int defense;
     int maximum_health;
+    int maximum_mana;
     bool is_defending;
     bool is_preparing_attack;
 } entity;
@@ -23,9 +26,12 @@ typedef enum entity_attack_value_type {
     ENTITY_ATTACK_VALUE_POWERFUL = 4,
 } entity_attack_value_type;
 
-extern bool entity_is_alive(const entity *e);
 extern int entity_get_attack_value(const entity *e, const entity_attack_value_type type);
-extern bool entity_is_critical_hit(const entity *e);
+extern int entity_heal(entity *e, const int heal_amount);
+extern int entity_restore_mana(entity *e, const int mana_amount);
 extern int entity_take_damage(entity *e, const int damage);
+
+extern bool entity_is_alive(const entity *e);
+extern bool entity_is_critical_hit(const entity *e);
 
 #endif // ENTITY_H
