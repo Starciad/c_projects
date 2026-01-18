@@ -54,19 +54,6 @@ int entity_heal(entity *e, const int heal_amount) {
     return actual_heal;
 }
 
-int entity_restore_mana(entity *e, const int mana_amount) {
-    int actual_mana = mana_amount;
-
-    if (e->current_mana + mana_amount > e->maximum_mana) {
-        actual_mana = e->maximum_mana - e->current_mana;
-        e->current_mana = e->maximum_mana;
-    } else {
-        e->current_mana += mana_amount;
-    }
-
-    return actual_mana;
-}
-
 // Returns the actual damage taken after defense calculations
 int entity_take_damage(entity *e, const int damage) {
     int value = damage;

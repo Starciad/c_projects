@@ -14,11 +14,15 @@
 #include "player.h"
 #include "random.h"
 
+static const int SHOP_ITEM_COUNT = 3;
+
 static entity player;
 static entity enemy;
 
 static inventory player_inventory;
 // static inventory enemy_inventory;
+
+static item shop_items[3];
 
 static int battles_won = 0;
 static int challenge_level = 1;
@@ -41,8 +45,25 @@ static void battle_rewards(void) {
     
     // Coins reward
     player.coins += coins_earned;
-
     printf("* You earned %u coins from the battle!\n", coins_earned);
+    game_sleep(1800);
+
+    // Items reward
+    if (random_int(0, 5) == 0) {
+        puts("* The enemy did not drop any items this time.");
+        game_sleep(1800);
+        return;
+    } else {
+        const item rewarded_item = item_get_random();
+
+        if (inventory_add_item(&player_inventory, rewarded_item)) {
+            printf("* You found a %s on the enemy!\n", item_get_name(rewarded_item));
+        } else {
+            printf("* You found a %s on the enemy, but your inventory is full!\n", item_get_name(rewarded_item));
+        }
+
+        game_sleep(1800);
+    }
 }
 
 static void player_level_up(void) {
@@ -84,6 +105,90 @@ static void player_level_up(void) {
             goto repeat_level_up_choice;
             break;
     }
+}
+
+static void populate_shop_items(void) {
+    for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
+        shop_items[i] = item_get_random();
+    }
+}
+
+static void display_shop_items(void) {
+    puts("Available items in the shop:");
+    game_sleep(1500);
+
+    for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
+        if (shop_items[i] != ITEM_NONE) {
+            printf("  %02d. %s - %s (%d coins)\n", i + 1, item_get_name(shop_items[i]), item_get_description(shop_items[i]), item_get_price(shop_items[i]));
+        } else {
+            printf("  %02d. (sold out)\n", i + 1);
+        }
+
+        game_sleep(1000);
+    }
+
+    puts("");
+}
+
+static bool shop_has_items(void) {
+    for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
+        if (shop_items[i] != ITEM_NONE) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void perform_shop_menu(void) {
+    populate_shop_items();
+
+    puts("");
+    puts("Welcome to the shop! Here you can buy items to help you in your battles.");
+    game_sleep(1800);
+
+    do {
+        display_shop_items();
+        game_sleep(1000);
+
+        printf("You have %d coins.\n", player.coins);
+        game_sleep(1000);
+
+        printf("Enter the number of the item you want to buy (or -1 to exit): ");
+
+        int choice;
+        scanf("%d", &choice);
+        if (choice == -1) {
+            puts("* You leave the shop.");
+            break;
+        } else if (choice < 1 || choice > SHOP_ITEM_COUNT) {
+            puts("Invalid choice!");
+            continue;
+        } else if (shop_items[choice - 1] == ITEM_NONE) {
+            puts("That item is sold out!");
+            continue;
+        } else {
+            const item selected_item = shop_items[choice - 1];
+            const int item_price = item_get_price(selected_item);
+
+            if (player.coins < item_price) {
+                puts("You don't have enough coins to buy that item!");
+                continue;
+            }
+
+            if (!inventory_add_item(&player_inventory, selected_item)) {
+                puts("Your inventory is full! You cannot buy more items.");
+                continue;
+            }
+
+            // Process the purchase
+            player.coins -= item_price;
+            shop_items[choice - 1] = ITEM_NONE; // Mark the item as sold out
+
+            printf("* You bought a %s for %d coins!\n\n", item_get_name(selected_item), item_price);
+            game_sleep(1800);
+        }
+    } while (shop_has_items());
 }
 
 static void player_recover(void) {
@@ -178,15 +283,10 @@ static void perform_defend(void) {
     game_sleep(1800);
 }
 
-static void display_magic_menu(void) {
-
-}
-
 static bool perform_inventory_menu(void) {
     printf("* You open your inventory (%d item(s)):\n", inventory_count_items(&player_inventory));
     inventory_print(&player_inventory);
     puts("(type -1 to exit inventory)");
-    game_sleep(1800);
 
     repeat_inventory_choice:
     printf("Select an item to use: ");
@@ -194,7 +294,7 @@ static bool perform_inventory_menu(void) {
     scanf("%d", &choice);
 
     if (choice == -1) {
-        puts("* You close your inventory.\n");
+        puts("* You close your inventory.");
         return false;
     } else if (choice < 1 || choice > INVENTORY_CAPACITY) {
         puts("Invalid choice!");
@@ -211,12 +311,12 @@ static bool perform_inventory_menu(void) {
 }
 
 static void perform_player_turn(void) {
+    repeat_player_choice:
     puts("It's your turn! What will you do?");
     puts("");
     printf("1. Attack (%d - %d damage) (%d%% critical chance)\n", entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MINIMUM), entity_get_attack_value(&player, ENTITY_ATTACK_VALUE_MAXIMUM), player.critical_chance);
-    puts("2. Magic");
-    puts("3. Defend");
-    puts("4. Inventory");
+    puts("2. Defend (halve incoming damage and prepare a powerful attack)");
+    puts("3. Inventory (access your items)");
     puts("");
 
     repeat_choice:
@@ -232,14 +332,12 @@ static void perform_player_turn(void) {
             perform_attack();
             break;
         case 2:
-            display_magic_menu();
-            break;
-        case 3:
             perform_defend();
             break;
-        case 4:
+        case 3:
             if (!perform_inventory_menu()) {
-                goto repeat_choice;
+                puts("");
+                goto repeat_player_choice;
             }
             break;
         default:
@@ -366,7 +464,9 @@ void game_start(void) {
             player_level_up();
             game_sleep(1800);
 
-            // Camping
+            // Shopping
+            perform_shop_menu();
+            game_sleep(1800);
         
             // Player Recovery
             player_recover();

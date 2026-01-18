@@ -10,10 +10,8 @@ typedef struct entity {
     int coins;
     int critical_chance;
     int current_health;
-    int current_mana;
     int defense;
     int maximum_health;
-    int maximum_mana;
     bool is_defending;
     bool is_preparing_attack;
 } entity;
@@ -28,7 +26,6 @@ typedef enum entity_attack_value_type {
 
 extern int entity_get_attack_value(const entity *e, const entity_attack_value_type type);
 extern int entity_heal(entity *e, const int heal_amount);
-extern int entity_restore_mana(entity *e, const int mana_amount);
 extern int entity_take_damage(entity *e, const int damage);
 
 extern bool entity_is_alive(const entity *e);
